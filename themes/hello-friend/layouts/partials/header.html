@@ -1,6 +1,8 @@
 <header class="header" style="display: block;">
   <span class="header__inner">
     {{ partial "logo.html" . }}
+  </span>
+  <span class="header__inner">
     <span class="header__right">
       {{ if len $.Site.Menus }}
         {{ partial "menu.html" . }}
@@ -14,13 +16,11 @@
       <span class="theme-toggle">
         {{ partial "theme-icon.html" . }}
       </span>
-    </span>
-  </span>
   {{ if $.Site.Params.TwitterURL }}
-    <span class="header__inner">
       <a href="{{ $.Site.Params.TwitterURL }}" title="@nuclearfarmboy" target="_blank" rel="noopener noreferrer">
         <img src="/img/2021TwitterLogo.png" alt="@nuclearfarmboy" style="width:25px; height: auto;">
       </a>
     </span>
   {{ end }}
+  </span>
 </header>
