@@ -1,0 +1,57 @@
+baseURL = '/'
+languageCode = 'en-us'
+title = "Malicious.pro"
+theme = "hello-friend"
+
+[params]
+ contentTypeName = "post"
+ showMenuItems = 2
+ twitterURL = "https://twitter.com/nuclearfarmboy"
+
+[languages]
+  [languages.en]
+    title = "Malicious.pro"
+    subtitle = "Security Researcher"
+    keywords = ""
+    copyright = ""
+    menuMore = "More"
+    writtenBy = "Written by"
+    readMore = "Read more"
+    readOtherPosts = "Read other posts"
+    newerPosts = "Newer posts"
+    olderPosts = "Older posts"
+    minuteReadingTime = "min read"
+    dateFormatSingle = "2006-01-02"
+    dateFormatList = "2006-01-02"
+
+    [languages.en.params.logo]
+      logoText = "cervando@malicious.pro "
+      logoUser = "cervando"
+      logoHost = "malicious.pro"
+      logoHomeLink = "/"
+
+    [languages.en.menu]
+      [[languages.en.menu.main]]
+        identifier = "about"
+        name = "about"
+        url = "/about"
+
+      [[languages.en.menu.main]]
+        identifier = "publications"
+        name = "publications"
+        url = "/publications"
+
+      [[languages.en.menu.main]]
+        identifier = "archive"
+        name = "archive"
+        url = "/archive"
+
+      [[languages.en.menu.main]]
+        identifier = "frecklescon"
+        name = "FrecklesCon"
+        url = "https://frecklescon.org"
+
+      [[languages.en.menu.main]]
+        identifier = "nuclearfarmboy"
+        name = "nuclearfarmboy.com"
+        url = "https://nuclearfarmboy.com"
