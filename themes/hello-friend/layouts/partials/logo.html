@@ -1,0 +1,16 @@
+<a
+  href="{{ if $.Site.Params.Logo.LogoHomeLink }}{{ $.Site.Params.Logo.LogoHomeLink }}{{ else }}{{ $.Site.BaseURL }}{{ end }}"
+  class="logo"
+  style="text-decoration: none;"
+>
+  <span class="logo__mark">{{ partial "greater-icon.html" . }}</span>
+  <span class="logo__text" style="color: seagreen;">{{ $.Site.Params.Logo.logoUser }}@{{ $.Site.Params.Logo.logoHost }}</span>
+  {{ if .File.BaseFileName }}
+  <span class="logo__text">:</span>
+    <span class="logo__text" style="color: slateblue;"> ~/{{ .File.BaseFileName }}</span>
+    {{ else }}
+    <span class="logo__text" style="color: slateblue;">:~</span>
+  {{ end }}
+  <span class="logo__text">$</span>
+    <span class="logo__cursor"></span>
+</a>
