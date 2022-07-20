@@ -5,7 +5,7 @@ theme = "hello-friend"
 
 [params]
  contentTypeName = "post"
- showMenuItems = 2
+ showMenuItems = 3
  twitterURL = "https://twitter.com/nuclearfarmboy"
 
 [languages]
@@ -55,3 +55,9 @@ theme = "hello-friend"
         identifier = "nuclearfarmboy"
         name = "nuclearfarmboy.com"
         url = "https://nuclearfarmboy.com"
+
+      [[languages.en.menu.main]]
+        identifier = "twitterhandle"
+        path = "/img/2021TwitterLogo.png"
+        url = "https://nuclearfarmboy.com"
+        alt = "nu"
