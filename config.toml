@@ -5,7 +5,7 @@ theme = "hello-friend"
 
 [params]
  contentTypeName = "post"
- showMenuItems = 2
+ showMenuItems = 1
  twitterURL = "https://twitter.com/nuclearfarmboy"
 
 [languages]
