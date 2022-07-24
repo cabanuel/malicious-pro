@@ -1,0 +1,7 @@
+<p style="text-align: center;"> 
+	{{ if isset .Params "link"}}
+	<a href="{{ .Get "link" }}">{{ .Get "caption"}}</a>
+	{{else}}
+	{{ .Get "caption" }}
+	{{end}}
+</p>
