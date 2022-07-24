@@ -1,11 +1,11 @@
 +++
 title = "Return of the Hack"
-date = "2022-07-23"
+date = "2022-07-24"
 author = "NuclearFarmboy"
 description = "You knew that I'd be back! With new content, scope, and ideas."
 +++
 
-## Return of the Hack
+## Figured it was time to get back into it!
 
 It's been a while since I have written anything on my blog [nuclearfarmboy](https://nuclearfarmboy.com). Life happens y'know? And sometimes that life comes with a job that has convoluted policies about you posting your own original research online. Mom never warned me about that! 
 
