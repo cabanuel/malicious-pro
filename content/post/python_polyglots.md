@@ -30,11 +30,11 @@ After a Friday night of more beers and TV and a lot of Googling, I figured I was
 
 ### The Bitmap Header
 
-First I think the question comes to "Why 32-bit RGB Bitmap"? And the answer is simple: it's old as hell, well documented, pretty simple, and most importantly ever byte for the image can be an ASCII encoded character should you choose!
+First I think the question comes to "Why 32-bit RGB Bitmap"? And the answer is simple: it's old as hell, well documented, pretty simple, and most importantly every byte for the image can be an ASCII encoded character should you choose!
 
 I'm getting ahead(er) of myself. 
 
-Repeating what I found out in my initial research, Bitmap is weird. It's file header defines what the image should look like by defining critical things like how many bytes in is the image data (Offset), the width in pixels, the height in pixels, the image size, and the file size. And all of these values mean that there is no "trailer" indicating EOF. Bit map ahead of time knows exactly how the image data needs to be parsed and placed because it already knows what the grid of pixels look like. Ain't that neat?
+Repeating what I found out in my initial research, Bitmap is weird. It's file header defines what the image should look like by defining critical things like how many bytes in is the image data (Offset), the width in pixels, the height in pixels, the image size, and the file size. And all of these values mean that there is no "trailer" indicating EOF. Bitmaps know exactly ahead of time how the image data needs to be parsed and placed because it already knows what the grid of pixels look like. Ain't that neat?
 
 It is this header layout that we are going to mess with. 
 
@@ -46,7 +46,7 @@ The first thing we see in that `1` position is that like almost every other file
 
 In the `2` position we see 4 bytes to describe, in bytes the file size of the Bitmap. This was useful back in the day. Nowadays not so much, and this is where the fun begins, because in my adventures I discovered that if you mess with the file size in the header...*NOTHING HAPPENS*. The Bitmap doesn't break. Your computer doesn't crash. Cats and dogs don't start living together. Your computer just YOLOs and keeps on going. We will come back to this. 
 
-In `3` we see the "Data Offset" which tells Paint "hey, the header is X number of bytes, after that you should start seeing 3 bytes (in the case of RGB 24 bit Bitmaps) per pixel of image data". In this example we see that `3` says that the offset is `0x36` bytes or 54 bytes. And sure enough, looking at that 4th row `0x30` and we count 6 bytes, we start seeing the `0x79` data that is the image, at least for this example.
+In `3` we see the "Data Offset" which tells Paint "hey, the header is X number of bytes, after that you should start seeing 3 bytes (in the case of RGB 24-bit Bitmaps) per pixel of image data". In this example we see that `3` says that the offset is `0x36` bytes or 54 bytes. And sure enough, looking at that 4th row `0x30` and we count 6 bytes, we start seeing the `0x79` data that is the image, at least for this example.
 
 Finally `4` and `5` tell Paint the Width and Height in pixels respectively, while `6` is the image size in bytes. BUT WAIT...why do we have the file size AND the image size in the header? Because Bitmap was made in the 90s by Microsoft. #YOLO
 
@@ -55,7 +55,7 @@ So out of these 6 key pieces of data, which one does Bitmap rely on for the size
 ### The (Nonexistent) Python Header and Other Python Quirks
 Unlike Bitmaps, Python scripts are the maximum YOLO/we'll do it live of file formats. Python scripts just have the raw data written directly on the file and the Python interpreter just starts going for it when called. One quirk that I will bring up that was my "Eureka!" moment, was the realization that Python does comments in an odd way. Python does not have inline comments like HTML or JavaScript does where you can drop in a comment, and resume the line you were writing. 
 
-Instead Python does comments by starting the comment with `#` and treating the remaining information as a comment until a carriage return and new line are read `\r\n` and in hex that is `0x0a 0x0d`. This will even ignore `;` which are typically used to separate lines in python one-liners. This presents an interesting quirk where in order to write a comment, the comment looks like:
+Instead Python does comments by starting the comment with `#` and treating the remaining information as a comment until a carriage return and new line are read `\r\n` and in hex that is `0x0a 0x0d`. This will even ignore `;` which are typically used to separate lines in Python one-liners. This presents an interesting quirk where in order to write a comment, the comment looks like:
 
 `# THIS IS A COMMENT \r\n`
 
@@ -113,11 +113,11 @@ Utilizing our Python knowledge, we modify the file size of the Bitmap to the ASC
 
 {{< image src="/img/python_polyglots/polyglot_vim_3.png" alt="Vim output" position="center" style="width: 700px; height:auto;" >}}
 
-Well recalling my side adventure into python headers and comments and all that jazz, I realized that since the file size of the Bitmap could be altered, why not use it to create a rather weird Python variable declaration followed by a **STUPIDLY LONG** comment? In other words, to Python, the file now looks like:
+Well, recalling my side adventure into Python headers and comments and all that jazz, I realized that since the file size of the Bitmap could be altered, why not use it to create a rather weird Python variable declaration followed by a **STUPIDLY LONG** comment? In other words, to Python, the file now looks like:
 ```
 BM=4;#<IMAGE DATA TREATED AS COMMENT><EOF>
 ```
-So python just thinks I am very verbose in my comments describing my variable `BM` that has a value of `4` (hooray for not needing to typecast in Python).
+So Python just thinks I am very verbose in my comments describing my variable `BM` that has a value of `4` (hooray for not needing to declare variable type in Python).
 
 ### Now what?
 With this, techncally our polyglot is complete. We just write our modified header to the original file in vim using `:%!xxd -r` and we `:x` to write the file and quit (`:wq` can go to hell. All my homies use `:x`). If I were to open this file, I would see that my art is still intact, and if I run `file` on this newly written file, which I renamed *"protect_ya_tech_modified_header.bmp*, my Mac thinks this is still a Bitmap:
