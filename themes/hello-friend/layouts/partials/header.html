@@ -20,7 +20,14 @@
       <a href="{{ $.Site.Params.TwitterURL }}" title="@nuclearfarmboy" target="_blank" rel="noopener noreferrer">
         <img src="/img/2021TwitterLogo.png" alt="@nuclearfarmboy" style="width:25px; height: auto;">
       </a>
+  {{ end }}
+  {{ if $.Site.Params.MastodonURL }}
+  <span>
+      <a href="{{ $.Site.Params.MastodonURL }}" title="@nuclearfarmboy@infosec.exchange" target="_blank" rel="noopener noreferrer">
+        <img src="/img/Mastodon.png" alt="@nuclearfarmboy" style="width:25px; height: auto;">
+      </a>
     </span>
   {{ end }}
+    </span>
   </span>
 </header>
