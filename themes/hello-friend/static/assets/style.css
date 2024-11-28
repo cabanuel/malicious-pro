@@ -139,6 +139,6 @@
 .collapsable-code__language{background:var(--background);border-radius:10px;color:var(--color);padding:3px 10px}
 .collapsable-code__toggle{color:var(--color);font-size:16px;padding:3px 10px}
 .collapsable-code__toggle:after{content:attr(data-label-collapse)}
-.collapsable-code pre{border-top-left-radius:0;border-top-right-radius:0;margin-top:0}
-.collapsable-code code:first-line,.collapsable-code pre:first-line{line-height:0}
+.collapsable-code pre{border-top-left-radius:0;border-top-right-radius:0;margin-top:0;max-height:400px;overflow: auto;}
+/*.collapsable-code code:first-line,.collapsable-code pre:first-line{line-height:0}*/
 .collapsable-code .code-toolbar{margin:0}
