@@ -3,12 +3,12 @@
   class="logo"
   style="text-decoration: none;"
 >
-  <span class="logo__mark">{{ partial "greater-icon.html" . }}</span>
-  <span class="logo__text" style="color: seagreen;">{{ $.Site.Params.Logo.logoUser }}@{{ $.Site.Params.Logo.logoHost }}</span>
   {{ if .File.BaseFileName }}
-  <span class="logo__text">:</span>
-    <span class="logo__text" style="color: slateblue;"> ~/{{ .File.BaseFileName }}</span>
+  <span class="logo__text" style="color: seagreen;">> $HOME</span>
+    <span class="logo__text" style="color: slateblue;">/{{ .File.BaseFileName }}</span>
     {{ else }}
+    <span class="logo__mark">{{ partial "greater-icon.html" . }}</span>
+    <span class="logo__text" style="color: seagreen;">{{ $.Site.Params.Logo.logoUser }}@{{ $.Site.Params.Logo.logoHost }}</span>
     <span class="logo__text" style="color: slateblue;">:~</span>
   {{ end }}
   <span class="logo__text">$</span>
