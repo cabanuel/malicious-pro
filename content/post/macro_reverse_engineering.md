@@ -57,7 +57,7 @@ So here is:
 ### "Cervando's Approach For Examining Potentially Malicious Spreadsheets While Being Only a Slight Idiot"™️
 
 #### Step 1. "Strings on Strings"
-I figured I would do the basic thing everyone does whenever you find an unknown file and just Use ```strings``` to examine the file and see if anything interesting is happening. The full output of strings is available at: https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/deals_strings.txt 
+I figured I would do the basic thing everyone does whenever you find an unknown file and just Use ```strings``` to examine the file and see if anything interesting is happening. The full output of strings is available on GitHub at: [deals_strings.txt](https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/deals_strings.txt)
 
 {{< image src="/img/macro_reverse_engineering/strings.gif" alt="So many strings" position="center" style="width: 500px; height:auto;" >}}
 
@@ -112,7 +112,7 @@ There it is!
 
 Here we see that there exists a file called ```deals/xl/vbaProject.bin```. This means that there *might* be a macro here for us to look at! So lets do some investigating!
 
-But before we go we also want to do some digging into the ```deals/xl/workbook.xml``` to be sure we arent missing anything, and because I want to see if my hunch of hidden sheets was correct. If you want to see this, it is available at https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/workbook.xml
+But before we go we also want to do some digging into the ```deals/xl/workbook.xml``` to be sure we arent missing anything, and because I want to see if my hunch of hidden sheets was correct. If you want to see this, it is available on GitHub at [woorkbook.xml](https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/workbook.xml)
 
 The first thing I see is that my hunch was right! There's two hidden sheets! Let's keep that in mind as we move forward.
 
@@ -139,9 +139,9 @@ Doing some searching on the World Wide Web, I found this tool in python called [
 olevba vbaProject.bin > vbasourcecode.txt
 ```
 
-Now the resulting file is pretty long to easily show, and is available at: 
+Now the resulting file is pretty long to easily show, and is available on GitHub at: 
 
-https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/vbasourcecode.txt
+[vbasourcecode.txt](https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/vbasourcecode.txt)
 
 Or it's also viewable here:
 
@@ -675,9 +675,9 @@ and then we simply use
 ```bash
 $ xlsx2csv deals.xlsm --all > deals.csv
 ```
-and we now have the contents of the xlsm file stored as a neat CSV file. The raw dump of this will be avaialble to you at https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/deals.csv
+and we now have the contents of the xlsm file stored as a neat CSV file. The raw dump of this will be avaialble to you on GitHub at [deals.csv](https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/deals.csv)
 
-From this CSV we then pull out ```Sheet2``` and we now have a CSV of all the contents of sheet 2. This will be available to you at https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/sheet2.csv and is literally just a lot of base64 snippets separated by commas. Ain't life grand?
+From this CSV we then pull out ```Sheet2``` and we now have a CSV of all the contents of sheet 2. This will be available to you on GitHub at [sheet2.csv](https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/sheet2.csv) and is literally just a lot of base64 snippets separated by commas. Ain't life grand?
 
 Now here is where we hit a bit of a hiccup, the ```Module2.bas``` script looks at the contents of a cell by referenicng its column and then row number in the following format where ```E40``` is column E, row 40. Our CSV does not have that. But that's no problem, because we have Python and Pandas. Now I will say that I took a peek at ```Sheet2.csv``` and saw that there are 27 columns, so in Python when I generate the column names as the capital letters A-Z I do have to append a ```AA``` to that list as a column name. 
 
@@ -734,7 +734,7 @@ e5b138e644d624905ca8d47c3b8a2cf41 + tfd753b886f3bd1f6da1a84488dee93f9 +
 z92ea38976d53e8b557cd5bbc2cd3e0f8 + xc6fd40b407cb3aac0d068f54af14362e
 ```
 
-so our final ```deals.py``` looks like:
+so our final ```deals.py```, [available on GitHub](https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/deals.py), looks like:
 {{< code language="python" title="deals.py" expand="expand" collapse="hide" isCollapsed="false">}}import string
 import pandas as pd
 import numpy as np
