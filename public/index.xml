@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Malicious.pro</title>
+    
+    
+    
+    <link>/</link>
+    <description>Recent content on Malicious.pro</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 12 Sep 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Polyglots: A Python Script By Any Other Name</title>
+      <link>/post/python_polyglots/</link>
+      <pubDate>Mon, 12 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/post/python_polyglots/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          Is it a Python Script? A Bitmap image? Both? This is what happens when I am left unsupervised.
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Return of the Hack</title>
+      <link>/post/return_of_the_hack/</link>
+      <pubDate>Sun, 24 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/post/return_of_the_hack/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          You knew that I&#39;d be back! With new content, scope, and ideas.
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Publications</title>
+      <link>/publications/</link>
+      <pubDate>Wed, 20 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/publications/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          Cervando&amp;rsquo;s Reading List: # Want more reading material and see what magical things happen when I actually take writing seriously?
+Banuelos, Cervando A., II; Burgin, Kelley W.; Cheuvront, Mike; Ellis, Devon P.; Guttman, Joshua D.; Loscocco, Peter A.; Rowe, Paul D.; Van Bruggen, Dirk C.; Vohaska, Brian M.; &amp;ldquo;Modeling for the Design of Adaptive Systems.&amp;rdquo; Defense Technical Information Center, Technical Report. 2021
+Moore, George M., Cervando A. Banuelos II, Thomas T.
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>/about/</link>
+      <pubDate>Tue, 19 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/about/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          Hello there! # My name is Cervando Bañuelos II and I am a Texas farmboy that grew up in a goat farm, has a nuclear engineering degree, a master&amp;rsquo;s in nonproliferation and terrorism studies, a master&amp;rsquo;s in computer science, and I regularly take things apart only to realize I ended up with more parts than what I started with.
+I am an avid lover lunch time, my corgi, and all things offensive security related.
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Archive</title>
+      <link>/archive/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/archive/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          
+          
+        
+        </description>
+    </item>
+    
+  </channel>
+</rss>

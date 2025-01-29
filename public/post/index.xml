@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Malicious.pro</title>
+    
+    
+    
+    <link>/post/</link>
+    <description>Recent content in Posts on Malicious.pro</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 12 Sep 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Polyglots: A Python Script By Any Other Name</title>
+      <link>/post/python_polyglots/</link>
+      <pubDate>Mon, 12 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/post/python_polyglots/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          Is it a Python Script? A Bitmap image? Both? This is what happens when I am left unsupervised.
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Return of the Hack</title>
+      <link>/post/return_of_the_hack/</link>
+      <pubDate>Sun, 24 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/post/return_of_the_hack/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          You knew that I&#39;d be back! With new content, scope, and ideas.
+          
+        
+        </description>
+    </item>
+    
+  </channel>
+</rss>
