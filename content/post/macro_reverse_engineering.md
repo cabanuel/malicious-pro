@@ -1,6 +1,6 @@
 +++
 title = "Watching My Macros"
-date = "2024-04-18"
+date = "2025-01-29"
 author = "NuclearFarmboy"
 description = "For once I am trying to look at a malware dropper in Excel rather than trying to write it."
 +++
