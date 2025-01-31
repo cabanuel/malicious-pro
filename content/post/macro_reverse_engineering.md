@@ -441,8 +441,7 @@ in file: vbaProject.bin - OLE stream: 'VBA/Sheet3'
 
 Now I admit that's a lot of code, but let's digest it piece by piece by starting at the bottom with the security scan provided by olevba:
 
-```
-+----------+--------------------+---------------------------------------------+
+{{< code language="text" title="olevba output" expand="expand" collapse="hide" isCollapsed="false">}}+----------+--------------------+---------------------------------------------+
 |Type      |Keyword             |Description                                  |
 +----------+--------------------+---------------------------------------------+
 |AutoExec  |AutoOpen            |Runs when the Word document is opened        |
@@ -460,7 +459,7 @@ Now I admit that's a lot of code, but let's digest it piece by piece by starting
 |Base64    |l)b                 |bCli                                         |
 |String    |                    |                                             |
 +----------+--------------------+---------------------------------------------+
-```
+{{< /code >}}
 We see that it found some interesting indicators of compromise (IOCs) and potentially malicious things! It found that:
 - this VBA file somewhere utilizes the ```AutoOpen``` subroutine which is VBAs way of running the macro as soon as the workbook is opened
 - this VBA file somehwere uses the ```Shell``` command which may run a command on the command line
